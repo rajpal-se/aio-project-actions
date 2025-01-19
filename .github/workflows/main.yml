@@ -70,6 +70,9 @@ jobs:
 
   trigger-utils:
     runs-on: ubuntu-latest
+    needs:
+      - trigger-types
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -97,6 +100,10 @@ jobs:
 
   trigger-backend:
     runs-on: ubuntu-latest
+    needs:
+      - trigger-api-specs
+      - trigger-utils
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -124,6 +131,9 @@ jobs:
 
   trigger-frontend:
     runs-on: ubuntu-latest
+    needs:
+      - trigger-backend
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
