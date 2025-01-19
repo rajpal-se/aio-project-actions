@@ -9,6 +9,7 @@ on:
 env:
   trigger_types: "false"
   trigger_api_specs: "false"
+  trigger_utils: "false"
   trigger_backend: "false"
   trigger_frontend: "false"
 
@@ -66,6 +67,33 @@ jobs:
       - name: Trigger API Specs Workflow
         if: env.trigger_api_specs == 'true'
         uses: ./.github/workflows/api-specs.yml
+
+  trigger-utils:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 10
+
+      - name: Check if utils files changed
+        id: check_utils_changes
+        run: |
+          # Get the list of files changed in the last commit
+          changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+
+          # Check if any changed file is inside the 'utils' directory
+          if echo "$changed_files" | grep -q '^utils/'; then
+            echo "Utils files changed"
+            echo "trigger_utils=true" >> $GITHUB_ENV
+          else
+            echo "No changes in the utils directory"
+            echo "trigger_utils=false" >> $GITHUB_ENV
+          fi
+
+      - name: Trigger Utils Workflow
+        if: env.trigger_utils == 'true'
+        uses: ./.github/workflows/utils.yml
 
   trigger-backend:
     runs-on: ubuntu-latest
