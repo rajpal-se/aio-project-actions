@@ -16,6 +16,9 @@ jobs:
   trigger-types:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Check if types files changed
         id: check_types_changes
         run: |
@@ -38,6 +41,9 @@ jobs:
   trigger-api-specs:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Check if API specs files changed
         id: check_api_specs_changes
         run: |
@@ -60,6 +66,9 @@ jobs:
   trigger-backend:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Check if backend files changed
         id: check_backend_changes
         run: |
