@@ -1,4 +1,4 @@
-name: Types Workflow
+name: API Specs Workflow
 
 on:
   workflow_dispatch:
