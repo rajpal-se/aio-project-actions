@@ -1,0 +1,40 @@
+name: Main Workflow
+
+on:
+  push:
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - "types/**"
+  workflow_dispatch:
+
+jobs:
+  trigger-backend:
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.event.head_commit.message, 'backend') }}
+    steps:
+      - name: Trigger Backend Workflow
+        uses: peter-evans/workflow-dispatch@v3
+        with:
+          workflow: backend.yml
+          ref: ${{ github.ref }}
+
+  trigger-frontend:
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.event.head_commit.message, 'frontend') }}
+    steps:
+      - name: Trigger Frontend Workflow
+        uses: peter-evans/workflow-dispatch@v3
+        with:
+          workflow: frontend.yml
+          ref: ${{ github.ref }}
+
+  trigger-types:
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.event.head_commit.message, 'types') }}
+    steps:
+      - name: Trigger Types Workflow
+        uses: peter-evans/workflow-dispatch@v3
+        with:
+          workflow: types.yml
+          ref: ${{ github.ref }}
