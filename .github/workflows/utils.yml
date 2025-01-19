@@ -1,4 +1,4 @@
-name: Types Workflow
+name: Utils Workflow
 
 on:
   workflow_dispatch:
@@ -10,6 +10,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Run Types Tasks
+      - name: Run Utils Tasks
         run: |
-          echo "Running types tasks..."
+          echo "Running utils tasks..."
+          echo 90
