@@ -14,3 +14,8 @@ jobs:
         run: |
           echo "Running backend tests..."
           echo 90
+          if [ "${{ secrets.TEST_SECRET }}" == "OK" ]; then
+            echo "Test secret is found And its value is [${{ secrets.TEST_SECRET }}]"
+          else
+            echo "Test secret is NOT found"
+          fi

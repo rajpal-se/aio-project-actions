@@ -13,6 +13,50 @@ env:
   trigger_frontend: "false"
 
 jobs:
+  trigger-types:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if types files changed
+        id: check_types_changes
+        run: |
+          # Get the list of files changed in the last commit
+          changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+
+          # Check if any changed file is inside the 'types' directory
+          if echo "$changed_files" | grep -q '^types/'; then
+            echo "Types files changed"
+            echo "trigger_types=true" >> $GITHUB_ENV
+          else
+            echo "No changes in the types directory"
+            echo "trigger_types=false" >> $GITHUB_ENV
+          fi
+
+      - name: Trigger Types Workflow
+        if: env.trigger_types == 'true'
+        uses: ./.github/workflows/types.yml
+
+  trigger-api-specs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if API specs files changed
+        id: check_api_specs_changes
+        run: |
+          # Get the list of files changed in the last commit
+          changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+
+          # Check if any changed file is inside the 'api-specs' directory
+          if echo "$changed_files" | grep -q '^api-specs/'; then
+            echo "API specs files changed"
+            echo "trigger_api_specs=true" >> $GITHUB_ENV
+          else
+            echo "No changes in the API specs directory"
+            echo "trigger_api_specs=false" >> $GITHUB_ENV
+          fi
+
+      - name: Trigger API Specs Workflow
+        if: env.trigger_api_specs == 'true'
+        uses: ./.github/workflows/api-specs.yml
+
   trigger-backend:
     runs-on: ubuntu-latest
     steps:
@@ -38,11 +82,21 @@ jobs:
   trigger-frontend:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger Frontend Workflow
-        uses: ./.github/workflows/frontend.yml
+      - name: Check if frontend files changed
+        id: check_frontend_changes
+        run: |
+          # Get the list of files changed in the last commit
+          changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
 
-  trigger-types:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Trigger Types Workflow
-        uses: ./.github/workflows/types.yml
+          # Check if any changed file is inside the 'frontend' directory
+          if echo "$changed_files" | grep -q '^frontend/'; then
+            echo "Frontend files changed"
+            echo "trigger_frontend=true" >> $GITHUB_ENV
+          else
+            echo "No changes in the frontend directory"
+            echo "trigger_frontend=false" >> $GITHUB_ENV
+          fi
+
+      - name: Trigger Frontend Workflow
+        if: env.trigger_frontend == 'true'
+        uses: ./.github/workflows/frontend.yml
