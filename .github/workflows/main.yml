@@ -2,39 +2,47 @@ name: Main Workflow
 
 on:
   push:
-    paths:
-      - "backend/**"
-      - "frontend/**"
-      - "types/**"
+    branches:
+      - main
   workflow_dispatch:
+
+env:
+  trigger_types: "false"
+  trigger_api_specs: "false"
+  trigger_backend: "false"
+  trigger_frontend: "false"
 
 jobs:
   trigger-backend:
     runs-on: ubuntu-latest
-    # if: ${{ contains(github.event.head_commit.message, 'backend') }}
     steps:
+      - name: Check if backend files changed
+        id: check_backend_changes
+        run: |
+          # Get the list of files changed in the last commit
+          changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+
+          # Check if any changed file is inside the 'backend' directory
+          if echo "$changed_files" | grep -q '^backend/'; then
+            echo "Backend files changed"
+            echo "trigger_backend=true" >> $GITHUB_ENV
+          else
+            echo "No changes in the backend directory"
+            echo "trigger_backend=false" >> $GITHUB_ENV
+          fi
+
       - name: Trigger Backend Workflow
-        uses: peter-evans/workflow-dispatch@v3
-        with:
-          workflow: backend.yml
-          ref: ${{ github.ref }}
+        if: env.trigger_backend == 'true'
+        uses: ./.github/workflows/backend.yml
 
   trigger-frontend:
     runs-on: ubuntu-latest
-    # if: ${{ contains(github.event.head_commit.message, 'frontend') }}
     steps:
       - name: Trigger Frontend Workflow
-        uses: peter-evans/workflow-dispatch@v3
-        with:
-          workflow: frontend.yml
-          ref: ${{ github.ref }}
+        uses: ./.github/workflows/frontend.yml
 
   trigger-types:
     runs-on: ubuntu-latest
-    # if: ${{ contains(github.event.head_commit.message, 'types') }}
     steps:
       - name: Trigger Types Workflow
-        uses: peter-evans/workflow-dispatch@v3
-        with:
-          workflow: types.yml
-          ref: ${{ github.ref }}
+        uses: ./.github/workflows/types.yml
